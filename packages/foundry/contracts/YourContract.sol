@@ -1,79 +1,193 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-// Useful for debugging. Remove when deploying to a live network.
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
 import "forge-std/console.sol";
 
-// Use openzeppelin to inherit battle-tested implementations (ERC20, ERC721, etc)
-// import "@openzeppelin/contracts/access/Ownable.sol";
-
 /**
- * A smart contract that allows changing a state variable of the contract and tracking the changes
- * It also allows the owner to withdraw the Ether in the contract
- * @author BuidlGuidl
+ * @title FestivalGreetings
+ * @dev A contract for creating and sending festival greeting NFTs with SVG designs
  */
-contract YourContract {
-    // State Variables
-    address public immutable owner;
-    string public greeting = "Building Unstoppable Apps!!!";
-    bool public premium = false;
-    uint256 public totalCounter = 0;
-    mapping(address => uint256) public userGreetingCounter;
+contract FestivalGreetings is ERC721URIStorage, Ownable {
+    using Strings for uint256;
 
-    // Events: a way to emit log statements from smart contract that can be listened to by external parties
-    event GreetingChange(address indexed greetingSetter, string newGreeting, bool premium, uint256 value);
+    // Simple counter for token IDs
+    uint256 private _nextTokenId = 1;
+    
+    // Mapping from token ID to festival type
+    mapping(uint256 => string) private _tokenFestivals;
+    
+    // Mapping from token ID to sender address
+    mapping(uint256 => address) private _tokenSenders;
+    
+    // Mapping from token ID to message
+    mapping(uint256 => string) private _tokenMessages;
+    
+    // Mapping from address to array of token IDs (sent)
+    mapping(address => uint256[]) private _sentTokens;
+    
+    // Mapping from address to array of token IDs (received)
+    mapping(address => uint256[]) private _receivedTokens;
 
-    // Constructor: Called once on contract deployment
-    // Check packages/foundry/deploy/Deploy.s.sol
-    constructor(address _owner) {
-        owner = _owner;
-    }
+    // Optional: Fee for minting a greeting card (set to 0 by default)
+    uint256 public mintFee = 0;
 
-    // Modifier: used to define a set of rules that must be met before or after a function is executed
-    // Check the withdraw() function
-    modifier isOwner() {
-        // msg.sender: predefined variable that represents address of the account that called the current function
-        require(msg.sender == owner, "Not the Owner");
-        _;
+    // Events
+    event GreetingCardMinted(
+        uint256 indexed tokenId,
+        address indexed sender,
+        address indexed recipient,
+        string festival,
+        string message,
+        uint256 value
+    );
+
+    constructor() ERC721("Festival Greetings", "FGRT") Ownable(msg.sender) {
+        console.log("Deploying Festival Greetings NFT Contract");
     }
 
     /**
-     * Function that allows anyone to change the state variable "greeting" of the contract and increase the counters
-     *
-     * @param _newGreeting (string memory) - new greeting to save on the contract
+     * @dev Generates SVG image for the greeting card
      */
-    function setGreeting(string memory _newGreeting) public payable {
-        // Print data to the anvil chain console. Remove when deploying to a live network.
+    function generateSVG(string memory message, string memory festival) internal pure returns (string memory) {
+        return string(
+            abi.encodePacked(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">',
+                '<rect width="500" height="500" fill="#f0f0f0"/>',
+                '<text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="24" fill="#333">',
+                festival,
+                '</text>',
+                '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="18" fill="#666">',
+                message,
+                '</text>',
+                '</svg>'
+            )
+        );
+    }
 
-        console.logString("Setting new greeting");
-        console.logString(_newGreeting);
+    /**
+     * @dev Creates metadata JSON for the token
+     */
+    function generateMetadata(
+        string memory,
+        string memory festival,
+        string memory svg
+    ) internal pure returns (string memory) {
+        string memory json = Base64.encode(
+            bytes(
+                string(
+                    abi.encodePacked(
+                        '{"name": "Festival Greeting",',
+                        '"description": "A special festival greeting NFT",',
+                        '"attributes": [{"trait_type": "Festival", "value": "',
+                        festival,
+                        '"}],',
+                        '"image": "data:image/svg+xml;base64,',
+                        Base64.encode(bytes(svg)),
+                        '"}'
+                    )
+                )
+            )
+        );
+        return string(abi.encodePacked("data:application/json;base64,", json));
+    }
 
-        greeting = _newGreeting;
-        totalCounter += 1;
-        userGreetingCounter[msg.sender] += 1;
-
-        // msg.value: built-in global variable that represents the amount of ether sent with the transaction
-        if (msg.value > 0) {
-            premium = true;
-        } else {
-            premium = false;
+    /**
+     * @dev Creates a new greeting card NFT and sends it to the recipient
+     */
+    function mintGreetingCard(
+        address recipient,
+        string memory message,
+        string memory festival
+    ) public payable returns (uint256) {
+        require(recipient != address(0), "Cannot mint to zero address");
+        require(bytes(message).length > 0, "Message cannot be empty");
+        require(bytes(festival).length > 0, "Festival type cannot be empty");
+        
+        if (mintFee > 0) {
+            require(msg.value >= mintFee, "Insufficient funds to mint greeting card");
         }
 
-        // emit: keyword used to trigger an event
-        emit GreetingChange(msg.sender, _newGreeting, msg.value > 0, msg.value);
+        uint256 newTokenId = _nextTokenId++;
+        string memory svg = generateSVG(message, festival);
+        string memory metadata = generateMetadata(message, festival, svg);
+
+        _safeMint(recipient, newTokenId);
+        _setTokenURI(newTokenId, metadata);
+        
+        _tokenFestivals[newTokenId] = festival;
+        _tokenSenders[newTokenId] = msg.sender;
+        _tokenMessages[newTokenId] = message;
+        
+        _sentTokens[msg.sender].push(newTokenId);
+        _receivedTokens[recipient].push(newTokenId);
+
+        if (msg.value > mintFee) {
+            (bool success, ) = recipient.call{value: msg.value - mintFee}("");
+            require(success, "ETH transfer failed");
+        }
+
+        emit GreetingCardMinted(newTokenId, msg.sender, recipient, festival, message, msg.value);
+        
+        return newTokenId;
     }
 
     /**
-     * Function that allows the owner to withdraw all the Ether in the contract
-     * The function can only be called by the owner of the contract as defined by the isOwner modifier
+     * @dev Returns the message for a given token ID
      */
-    function withdraw() public isOwner {
-        (bool success,) = owner.call{ value: address(this).balance }("");
-        require(success, "Failed to send Ether");
+    function getGreetingMessage(uint256 tokenId) public view returns (string memory) {
+        require(_ownerOf(tokenId) != address(0), "Message query for nonexistent token");
+        return _tokenMessages[tokenId];
     }
 
     /**
-     * Function that allows the contract to receive ETH
+     * @dev Returns the festival type for a given token ID
      */
-    receive() external payable { }
+    function getGreetingFestival(uint256 tokenId) public view returns (string memory) {
+        require(_ownerOf(tokenId) != address(0), "Festival query for nonexistent token");
+        return _tokenFestivals[tokenId];
+    }
+
+    /**
+     * @dev Returns the sender address for a given token ID
+     */
+    function getGreetingSender(uint256 tokenId) public view returns (address) {
+        require(_ownerOf(tokenId) != address(0), "Sender query for nonexistent token");
+        return _tokenSenders[tokenId];
+    }
+
+    /**
+     * @dev Returns all token IDs sent by an address
+     */
+    function getSentGreetings(address sender) public view returns (uint256[] memory) {
+        return _sentTokens[sender];
+    }
+
+    /**
+     * @dev Returns all token IDs received by an address
+     */
+    function getReceivedGreetings(address recipient) public view returns (uint256[] memory) {
+        return _receivedTokens[recipient];
+    }
+
+    /**
+     * @dev Sets the mint fee
+     */
+    function setMintFee(uint256 newFee) public onlyOwner {
+        mintFee = newFee;
+    }
+
+    /**
+     * @dev Withdraw contract balance to owner
+     */
+    function withdraw() public onlyOwner {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No balance to withdraw");
+        
+        (bool success, ) = owner().call{value: balance}("");
+        require(success, "Withdrawal failed");
+    }
 }

@@ -84,19 +84,16 @@ function getDeploymentHistory(broadcastPath) {
 }
 
 function getArtifactOfContract(contractName) {
-  const current_path_to_artifacts = join(
-    __dirname,
-    "..",
-    `out/${contractName}.sol`
-  );
-
-  if (!existsSync(current_path_to_artifacts)) return null;
-
-  const artifactJson = JSON.parse(
-    readFileSync(`${current_path_to_artifacts}/${contractName}.json`)
-  );
-
-  return artifactJson;
+  const outDir = join(__dirname, "..", "out");
+  if (!existsSync(outDir)) return null;
+  const folders = getDirectories(outDir);
+  for (const folder of folders) {
+    const artifactPath = join(outDir, folder, `${contractName}.json`);
+    if (existsSync(artifactPath)) {
+      return JSON.parse(readFileSync(artifactPath));
+    }
+  }
+  return null;
 }
 
 function getInheritedFromContracts(artifact) {
@@ -174,12 +171,15 @@ function processAllDeployments(broadcastPath) {
   allDeployments.forEach((deployment) => {
     const { chainId, contractName } = deployment;
     const artifact = getArtifactOfContract(contractName);
-
+    if (!artifact) {
+      console.warn(`[DEBUG] No artifact found for contract: ${contractName}`);
+    } else {
+      console.log(`[DEBUG] Found contract: ${contractName} at ${deployment.address} on chain ${chainId}`);
+    }
     if (artifact) {
       if (!allContracts[chainId]) {
         allContracts[chainId] = {};
       }
-
       allContracts[chainId][contractName] = {
         address: deployment.address,
         abi: artifact.abi,
@@ -197,35 +197,8 @@ function main() {
   const current_path_to_broadcast = join(__dirname, "..", "broadcast");
   const current_path_to_deployments = join(__dirname, "..", "deployments");
 
-  const Deploymentchains = getFiles(current_path_to_deployments);
-  const deployments = {};
-
-  // Load existing deployments from deployments directory
-  Deploymentchains.forEach((chain) => {
-    if (!chain.endsWith(".json")) return;
-    chain = chain.slice(0, -5);
-    var deploymentObject = JSON.parse(
-      readFileSync(`${current_path_to_deployments}/${chain}.json`)
-    );
-    deployments[chain] = deploymentObject;
-  });
-
   // Process all deployments from all script folders
-  const allGeneratedContracts = processAllDeployments(
-    current_path_to_broadcast
-  );
-
-  // Update contract keys based on deployments if they exist
-  Object.entries(allGeneratedContracts).forEach(([chainId, contracts]) => {
-    Object.entries(contracts).forEach(([contractName, contractData]) => {
-      const deployedName = deployments[chainId]?.[contractData.address];
-      if (deployedName) {
-        // If we have a deployment name, use it instead of the contract name
-        allGeneratedContracts[chainId][deployedName] = contractData;
-        delete allGeneratedContracts[chainId][contractName];
-      }
-    });
-  });
+  const allGeneratedContracts = processAllDeployments(current_path_to_broadcast);
 
   const NEXTJS_TARGET_DIR = "../nextjs/contracts/";
 
