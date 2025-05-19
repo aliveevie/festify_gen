@@ -761,7 +761,7 @@ const deployedContracts = {
   },
   11155111: {
     FestivalGreetings: {
-      address: "0x4d5a447172bca77f35348d1fd7ffa3c0bb242561",
+      address: "0xe30f4ae08053fb4bf17c36b720bf7844898292e8",
       abi: [
         {
           type: "constructor",
@@ -1509,7 +1509,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deploymentFile: "run-1747645741.json",
+      deploymentFile: "run-1747647481.json",
       deploymentScript: "Deploy.s.sol",
     },
   },
