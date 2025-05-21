@@ -26,6 +26,12 @@ contract FestivalGreetings is ERC721URIStorage, Ownable {
     // Mapping from token ID to message
     mapping(uint256 => string) private _tokenMessages;
     
+    // Mapping from token ID to image URI (IPFS link or SVG content)
+    mapping(uint256 => string) private _tokenImages;
+    
+    // Mapping from token ID to image type (0 for IPFS, 1 for SVG)
+    mapping(uint256 => uint8) private _tokenImageTypes;
+    
     // Mapping from address to array of token IDs (sent)
     mapping(address => uint256[]) private _sentTokens;
     
@@ -50,9 +56,9 @@ contract FestivalGreetings is ERC721URIStorage, Ownable {
     }
 
     /**
-     * @dev Generates SVG image for the greeting card
+     * @dev Generates default SVG image for the greeting card
      */
-    function generateSVG(string memory message, string memory festival) internal pure returns (string memory) {
+    function generateDefaultSVG(string memory message, string memory festival) internal pure returns (string memory) {
         return string(
             abi.encodePacked(
                 '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">',
@@ -74,8 +80,18 @@ contract FestivalGreetings is ERC721URIStorage, Ownable {
     function generateMetadata(
         string memory,
         string memory festival,
-        string memory svg
+        string memory imageUri,
+        uint8 imageType
     ) internal pure returns (string memory) {
+        string memory imageData;
+        if (imageType == 0) {
+            // IPFS link
+            imageData = imageUri;
+        } else {
+            // SVG content
+            imageData = string(abi.encodePacked("data:image/svg+xml;base64,", Base64.encode(bytes(imageUri))));
+        }
+
         string memory json = Base64.encode(
             bytes(
                 string(
@@ -85,8 +101,8 @@ contract FestivalGreetings is ERC721URIStorage, Ownable {
                         '"attributes": [{"trait_type": "Festival", "value": "',
                         festival,
                         '"}],',
-                        '"image": "data:image/svg+xml;base64,',
-                        Base64.encode(bytes(svg)),
+                        '"image": "',
+                        imageData,
                         '"}'
                     )
                 )
@@ -97,23 +113,35 @@ contract FestivalGreetings is ERC721URIStorage, Ownable {
 
     /**
      * @dev Creates a new greeting card NFT and sends it to the recipient
+     * @param recipient The address that will receive the NFT
+     * @param message The greeting message
+     * @param festival The type of festival
+     * @param imageUri The IPFS link or SVG content
+     * @param isIpfsLink True if imageUri is an IPFS link, false if it's SVG content
      */
     function mintGreetingCard(
         address recipient,
         string memory message,
-        string memory festival
+        string memory festival,
+        string memory imageUri,
+        bool isIpfsLink
     ) public payable returns (uint256) {
         require(recipient != address(0), "Cannot mint to zero address");
         require(bytes(message).length > 0, "Message cannot be empty");
         require(bytes(festival).length > 0, "Festival type cannot be empty");
+        require(bytes(imageUri).length > 0, "Image URI cannot be empty");
         
         if (mintFee > 0) {
             require(msg.value >= mintFee, "Insufficient funds to mint greeting card");
         }
 
         uint256 newTokenId = _nextTokenId++;
-        string memory svg = generateSVG(message, festival);
-        string memory metadata = generateMetadata(message, festival, svg);
+        string memory metadata = generateMetadata(
+            message,
+            festival,
+            imageUri,
+            isIpfsLink ? 0 : 1
+        );
 
         _safeMint(recipient, newTokenId);
         _setTokenURI(newTokenId, metadata);
@@ -121,6 +149,8 @@ contract FestivalGreetings is ERC721URIStorage, Ownable {
         _tokenFestivals[newTokenId] = festival;
         _tokenSenders[newTokenId] = msg.sender;
         _tokenMessages[newTokenId] = message;
+        _tokenImages[newTokenId] = imageUri;
+        _tokenImageTypes[newTokenId] = isIpfsLink ? 0 : 1;
         
         _sentTokens[msg.sender].push(newTokenId);
         _receivedTokens[recipient].push(newTokenId);
@@ -157,6 +187,22 @@ contract FestivalGreetings is ERC721URIStorage, Ownable {
     function getGreetingSender(uint256 tokenId) public view returns (address) {
         require(_ownerOf(tokenId) != address(0), "Sender query for nonexistent token");
         return _tokenSenders[tokenId];
+    }
+
+    /**
+     * @dev Returns the image URI for a given token ID
+     */
+    function getGreetingImage(uint256 tokenId) public view returns (string memory) {
+        require(_ownerOf(tokenId) != address(0), "Image query for nonexistent token");
+        return _tokenImages[tokenId];
+    }
+
+    /**
+     * @dev Returns the image type for a given token ID (0 for IPFS, 1 for SVG)
+     */
+    function getGreetingImageType(uint256 tokenId) public view returns (uint8) {
+        require(_ownerOf(tokenId) != address(0), "Image type query for nonexistent token");
+        return _tokenImageTypes[tokenId];
     }
 
     /**

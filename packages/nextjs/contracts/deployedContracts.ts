@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     FestivalGreetings: {
-      address: "0xf7cd8fa9b94db2aa972023b379c7f72c65e4de9d",
+      address: "0xdc3b3a705b5880d9c9fa0534131454d6aead269b",
       abi: [
         {
           type: "constructor",
@@ -85,6 +85,44 @@ const deployedContracts = {
               name: "",
               type: "string",
               internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getGreetingImage",
+          inputs: [
+            {
+              name: "tokenId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getGreetingImageType",
+          inputs: [
+            {
+              name: "tokenId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint8",
+              internalType: "uint8",
             },
           ],
           stateMutability: "view",
@@ -220,6 +258,16 @@ const deployedContracts = {
               name: "festival",
               type: "string",
               internalType: "string",
+            },
+            {
+              name: "imageUri",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "isIpfsLink",
+              type: "bool",
+              internalType: "bool",
             },
           ],
           outputs: [
@@ -755,13 +803,13 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deploymentFile: "run-1747482313.json",
+      deploymentFile: "run-1747688697.json",
       deploymentScript: "Deploy.s.sol",
     },
   },
   11155111: {
     FestivalGreetings: {
-      address: "0xe30f4ae08053fb4bf17c36b720bf7844898292e8",
+      address: "0xdc9600f4a84236ef56eebc60fb9a274ca814bd1f",
       abi: [
         {
           type: "constructor",
@@ -839,6 +887,44 @@ const deployedContracts = {
               name: "",
               type: "string",
               internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getGreetingImage",
+          inputs: [
+            {
+              name: "tokenId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getGreetingImageType",
+          inputs: [
+            {
+              name: "tokenId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint8",
+              internalType: "uint8",
             },
           ],
           stateMutability: "view",
@@ -974,6 +1060,16 @@ const deployedContracts = {
               name: "festival",
               type: "string",
               internalType: "string",
+            },
+            {
+              name: "imageUri",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "isIpfsLink",
+              type: "bool",
+              internalType: "bool",
             },
           ],
           outputs: [
@@ -1509,7 +1605,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deploymentFile: "run-1747647481.json",
+      deploymentFile: "run-1747817065.json",
       deploymentScript: "Deploy.s.sol",
     },
   },
