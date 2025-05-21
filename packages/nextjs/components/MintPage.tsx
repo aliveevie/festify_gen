@@ -6,7 +6,12 @@ import { styled } from "@mui/material/styles";
 import { create } from "ipfs-http-client";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { useAccount } from "wagmi";
-import { toast } from "react-hot-toast";
+import { toast }  from "react-hot-toast";
+import dynamic from "next/dynamic";
+
+const IpfsUploader = dynamic(() => import("./IpfsUploader"), {
+  ssr: false,
+});
 
 // Predefined SVG designs
 const predefinedDesigns = [
@@ -84,20 +89,9 @@ const MintPage = () => {
   const [ipfsHash, setIpfsHash] = useState("");
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
 
   const { writeContractAsync, isMining } = useScaffoldWriteContract({
     contractName: "FestivalGreetings",
-  });
-
-  // Initialize IPFS client
-  const ipfs = create({
-    url: "https://ipfs.infura.io:5001/api/v0",
-    headers: {
-      authorization: `Basic ${Buffer.from(
-        `${process.env.NEXT_PUBLIC_INFURA_IPFS_PROJECT_ID}:${process.env.NEXT_PUBLIC_INFURA_IPFS_PROJECT_SECRET}`,
-      ).toString("base64")}`,
-    },
   });
 
   // Update preview when message or design changes
@@ -134,24 +128,10 @@ const MintPage = () => {
     }
   };
 
-  const handleIpfsUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      try {
-        setIsUploading(true);
-        const added = await ipfs.add(file);
-        setIpfsHash(added.path);
-        setSelectedDesign(null);
-        setCustomSvg("");
-        toast.success("Image uploaded to IPFS successfully!");
-      } catch (err) {
-        setError("Failed to upload to IPFS");
-        toast.error("Failed to upload to IPFS");
-        console.error(err);
-      } finally {
-        setIsUploading(false);
-      }
-    }
+  const handleIpfsUploadComplete = (hash: string) => {
+    setIpfsHash(hash);
+    setSelectedDesign(null);
+    setCustomSvg("");
   };
 
   const handleMint = async () => {
@@ -211,7 +191,7 @@ const MintPage = () => {
 
       <Grid container spacing={4}>
         {/* Left side - Form */}
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6} component="div">
           <Box sx={{ mb: 4 }}>
             <TextField
               fullWidth
@@ -237,7 +217,7 @@ const MintPage = () => {
 
           <Grid container spacing={2} sx={{ mb: 4 }}>
             {predefinedDesigns.map(design => (
-              <Grid xs={6} key={design.id}>
+              <Grid item xs={6} key={design.id} component="div">
                 <DesignCard
                   onClick={() => handleDesignSelect(design.id)}
                   sx={{
@@ -271,10 +251,7 @@ const MintPage = () => {
               Upload SVG
               <input type="file" hidden accept=".svg" onChange={handleCustomSvgUpload} />
             </Button>
-            <Button variant="outlined" component="label" disabled={isUploading}>
-              {isUploading ? <CircularProgress size={24} /> : "Upload to IPFS"}
-              <input type="file" hidden accept="image/*" onChange={handleIpfsUpload} />
-            </Button>
+            <IpfsUploader onUploadComplete={handleIpfsUploadComplete} />
           </Box>
 
           {error && (
@@ -283,13 +260,13 @@ const MintPage = () => {
             </Typography>
           )}
 
-          <Button variant="contained" size="large" fullWidth onClick={handleMint} disabled={isMining || isUploading}>
+          <Button variant="contained" size="large" fullWidth onClick={handleMint} disabled={isMining}>
             {isMining ? <CircularProgress size={24} /> : "Mint NFT"}
           </Button>
         </Grid>
 
         {/* Right side - Preview */}
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6} component="div">
           <PreviewCard>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -315,4 +292,4 @@ const MintPage = () => {
   );
 };
 
-export default MintPage; 
+export default MintPage;

@@ -1,9 +1,11 @@
 "use client";
 
-import MintPage from "~~/components/MintPage";
+import dynamic from "next/dynamic";
 
-const Mint = () => {
+const MintPage = dynamic(() => import("../../components/MintPage"), {
+  ssr: false,
+});
+
+export default function Page() {
   return <MintPage />;
-};
-
-export default Mint; 
+} 
