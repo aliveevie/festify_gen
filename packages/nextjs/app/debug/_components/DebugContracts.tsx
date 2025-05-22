@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSessionStorage } from "usehooks-ts";
 import { BarsArrowUpIcon } from "@heroicons/react/20/solid";
 import { ContractUI } from "~~/app/debug/_components/contract";
@@ -19,17 +19,30 @@ export function DebugContracts() {
     [contractsData],
   );
 
-  const [selectedContract, setSelectedContract] = useSessionStorage<ContractName>(
-    selectedContractStorageKey,
-    contractNames[0],
-    { initializeWithValue: false },
-  );
+  // Use useState as fallback when IndexedDB is not available
+  const [selectedContract, setSelectedContract] = useState<ContractName>(contractNames[0]);
+
+  // Try to use session storage if available
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const [storedContract, setStoredContract] = useSessionStorage<ContractName>(
+          selectedContractStorageKey,
+          contractNames[0],
+          { initializeWithValue: false },
+        );
+        setSelectedContract(storedContract);
+      } catch (error) {
+        console.warn('Session storage not available:', error);
+      }
+    }
+  }, [contractNames]);
 
   useEffect(() => {
     if (!contractNames.includes(selectedContract)) {
       setSelectedContract(contractNames[0]);
     }
-  }, [contractNames, selectedContract, setSelectedContract]);
+  }, [contractNames, selectedContract]);
 
   return (
     <div className="flex flex-col gap-y-6 lg:gap-y-8 py-8 lg:py-12 justify-center items-center">

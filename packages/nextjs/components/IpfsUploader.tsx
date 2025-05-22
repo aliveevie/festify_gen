@@ -11,28 +11,38 @@ interface IpfsUploaderProps {
 const IpfsUploader = ({ onUploadComplete }: IpfsUploaderProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [ipfs, setIpfs] = useState<any>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const initializeIpfs = async () => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
+    const initIpfs = async () => {
       try {
-        const { create } = await import("ipfs-http-client");
-        const ipfsClient = create({
-          url: "https://ipfs.infura.io:5001/api/v0",
-          headers: {
-            authorization: `Basic ${Buffer.from(
-              `${process.env.NEXT_PUBLIC_INFURA_IPFS_PROJECT_ID}:${process.env.NEXT_PUBLIC_INFURA_IPFS_PROJECT_SECRET}`,
-            ).toString("base64")}`,
-          },
-        });
-        setIpfs(ipfsClient);
+        // Only import and initialize IPFS in the browser
+        if (typeof window !== 'undefined') {
+          const { create } = await import('ipfs-http-client');
+          const ipfsClient = create({
+            url: "https://ipfs.infura.io:5001/api/v0",
+            headers: {
+              authorization: `Basic ${Buffer.from(
+                `${process.env.NEXT_PUBLIC_INFURA_IPFS_PROJECT_ID}:${process.env.NEXT_PUBLIC_INFURA_IPFS_PROJECT_SECRET}`,
+              ).toString("base64")}`,
+            },
+          });
+          setIpfs(ipfsClient);
+        }
       } catch (err) {
         console.error("Failed to initialize IPFS:", err);
         toast.error("Failed to initialize IPFS client");
       }
     };
 
-    initializeIpfs();
-  }, []);
+    initIpfs();
+  }, [isMounted]);
 
   const handleIpfsUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -50,6 +60,11 @@ const IpfsUploader = ({ onUploadComplete }: IpfsUploaderProps) => {
       }
     }
   };
+
+  // Don't render anything until we're mounted on the client
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Button variant="outlined" component="label" disabled={isUploading || !ipfs}>
