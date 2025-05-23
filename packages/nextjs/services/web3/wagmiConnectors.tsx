@@ -13,6 +13,15 @@ import scaffoldConfig from "~~/scaffold.config";
 
 const { onlyLocalBurnerWallet, targetNetworks } = scaffoldConfig;
 
+// Get the WalletConnect project ID from environment variable or config
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || scaffoldConfig.walletConnectProjectId;
+
+if (!projectId || projectId.length !== 32) {
+  console.warn(
+    "⚠️ WalletConnect projectId is missing or invalid. Please get a project ID at https://cloud.walletconnect.com",
+  );
+}
+
 const wallets = [
   metaMaskWallet,
   walletConnectWallet,
@@ -35,9 +44,9 @@ export const wagmiConnectors = connectorsForWallets(
       wallets,
     },
   ],
-
   {
-    appName: "scaffold-eth-2",
-    projectId: scaffoldConfig.walletConnectProjectId,
+    appName: "Festify",
+    projectId: projectId || "YOUR_PROJECT_ID", // This will be replaced by the actual project ID
+    chains: targetNetworks,
   },
 );
