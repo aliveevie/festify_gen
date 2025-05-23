@@ -5,67 +5,110 @@ import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Address } from "~~/components/scaffold-eth";
+import { Header } from "~~/components/Header";
+import Hero from "~~/components/Hero";
+import { Footer } from "~~/components/Footer";
+import FeatureCard from "~~/components/FeatureCard";
+import { Gift, Sparkles, Share2, ShieldCheck } from "lucide-react";
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
 
   return (
-    <>
-      <div className="flex items-center flex-col grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <div className="flex justify-center items-center space-x-2 flex-col">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
-          </div>
-
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/app/page.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
-          </p>
-        </div>
-
-        <div className="grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col md:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-grow">
+        <Hero />
+        {/* Features Section */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Why Choose Festival Greetings?</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Create personalized greetings for all festivals and special occasions.
+                Share joy with your loved ones through beautiful designs.
               </p>
             </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <FeatureCard 
+                icon={Gift}
+                title="Personalized Greetings"
+                description="Create custom greetings with personal messages for any festival or occasion."
+              />
+              <FeatureCard 
+                icon={Sparkles}
+                title="Beautiful Designs"
+                description="Choose from a variety of stunning design templates for your greetings."
+              />
+              <FeatureCard 
+                icon={Share2}
+                title="Easy Sharing"
+                description="Share your greetings on social media platforms with just a click."
+              />
+              <FeatureCard 
+                icon={ShieldCheck}
+                title="Secure & Private"
+                description="Your greetings are securely stored and only shared with intended recipients."
+              />
             </div>
           </div>
-        </div>
-      </div>
-    </>
+        </section>
+        {/* How It Works Section */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">How It Works</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Creating and sharing festival greetings has never been easier.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">1</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Choose a Design</h3>
+                <p className="text-gray-600">
+                  Select from multiple beautiful design templates for your greeting card.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">2</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Personalize Message</h3>
+                <p className="text-gray-600">
+                  Add your personal message and customize the greeting to your liking.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">3</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Share & Celebrate</h3>
+                <p className="text-gray-600">
+                  Send your greeting and share the joy with your loved ones.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        {/* CTA Section */}
+        <section className="py-20" style={{ background: "linear-gradient(135deg, #a084ee 0%, #8854d0 100%)" }}>
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Start Creating Your Greetings Today</h2>
+            <p className="mb-10 max-w-2xl mx-auto text-white text-lg">
+              Join thousands of users who are already spreading joy with personalized festival greetings.
+            </p>
+            <a 
+              href="/app" 
+              className="inline-block bg-white text-[#8854d0] hover:bg-gray-100 font-semibold rounded-md px-8 py-4 text-lg shadow-md transition-colors"
+            >
+              Create a Greeting
+            </a>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 };
 

@@ -8,6 +8,7 @@ import { BuidlGuidlLogo } from "~~/components/assets/BuidlGuidlLogo";
 import { Faucet } from "~~/components/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useGlobalState } from "~~/services/store/store";
+import { Globe, Send, Twitter } from "lucide-react";
 
 /**
  * Site footer
@@ -18,63 +19,56 @@ export const Footer = () => {
   const isLocalNetwork = targetNetwork.id === hardhat.id;
 
   return (
-    <div className="min-h-0 py-5 px-1 mb-11 lg:mb-0">
-      <div>
-        <div className="fixed flex justify-between items-center w-full z-10 p-4 bottom-0 left-0 pointer-events-none">
-          <div className="flex flex-col md:flex-row gap-2 pointer-events-auto">
-            {nativeCurrencyPrice > 0 && (
-              <div>
-                <div className="btn btn-primary btn-sm font-normal gap-1 cursor-auto">
-                  <CurrencyDollarIcon className="h-4 w-4" />
-                  <span>{nativeCurrencyPrice.toFixed(2)}</span>
-                </div>
+    <>
+      <footer className="bg-gray-50 py-10 px-4 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          {/* Left: Logo and description */}
+          <div>
+            <div className="flex items-center mb-2">
+              <div className="w-9 h-9 rounded-lg bg-black flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-lg">FG</span>
               </div>
-            )}
-            {isLocalNetwork && (
-              <>
-                <Faucet />
-                <Link href="/blockexplorer" passHref className="btn btn-primary btn-sm font-normal gap-1">
-                  <MagnifyingGlassIcon className="h-4 w-4" />
-                  <span>Block Explorer</span>
-                </Link>
-              </>
-            )}
+              <span className="font-bold text-xl">Festival Greetings</span>
+            </div>
+            <p className="text-gray-600 mb-4 max-w-xs">
+              Send personalized festival greetings to your loved ones and spread joy. Create beautiful designs and share memorable moments.
+            </p>
+            <div className="flex gap-3 mt-2">
+              <a href="https://arbilearn.club" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors">
+                <Globe className="w-5 h-5 text-gray-700" />
+              </a>
+              <a href="https://t.me/ibrahim_193" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors">
+                <Send className="w-5 h-5 text-gray-700" />
+              </a>
+              <a href="https://x.com/iabdulkarim472" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors">
+                <Twitter className="w-5 h-5 text-gray-700" />
+              </a>
+            </div>
           </div>
-          <SwitchTheme className={`pointer-events-auto ${isLocalNetwork ? "self-end md:self-auto" : ""}`} />
+          {/* Center: Links */}
+          <div>
+            <h4 className="font-bold mb-3">Links</h4>
+            <ul className="space-y-2 text-gray-700">
+              <li><Link href="/">Home</Link></li>
+              <li><Link href="/create-greetings">Create Greetings</Link></li>
+              <li><Link href="/about">About</Link></li>
+            </ul>
+          </div>
+          {/* Right: Support */}
+          <div>
+            <h4 className="font-bold mb-3">Support</h4>
+            <ul className="space-y-2 text-gray-700">
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+            </ul>
+          </div>
         </div>
+      </footer>
+      <div className="bg-gray-50 border-t border-gray-200 py-4 text-center text-sm text-gray-500">
+        Forked with <span className="text-red-500">❤️</span> by <a href="https://buidlguidl.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-[#8854d0]">BuidlGuidl</a>
       </div>
-      <div className="w-full">
-        <ul className="menu menu-horizontal w-full">
-          <div className="flex justify-center items-center gap-2 text-sm w-full">
-            <div className="text-center">
-              <a href="https://github.com/scaffold-eth/se-2" target="_blank" rel="noreferrer" className="link">
-                Fork me
-              </a>
-            </div>
-            <span>·</span>
-            <div className="flex justify-center items-center gap-2">
-              <p className="m-0 text-center">
-                Built with <HeartIcon className="inline-block h-4 w-4" /> at
-              </p>
-              <a
-                className="flex justify-center items-center gap-1"
-                href="https://buidlguidl.com/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <BuidlGuidlLogo className="w-3 h-5 pb-1" />
-                <span className="link">BuidlGuidl</span>
-              </a>
-            </div>
-            <span>·</span>
-            <div className="text-center">
-              <a href="https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA" target="_blank" rel="noreferrer" className="link">
-                Support
-              </a>
-            </div>
-          </div>
-        </ul>
-      </div>
-    </div>
+    </>
   );
 };
