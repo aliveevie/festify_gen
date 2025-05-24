@@ -11,12 +11,12 @@ import { Facebook, Twitter, Linkedin, Mail, Share2 } from "lucide-react";
 import { useToast } from "~~/hooks/use-toast";
 
 interface Greeting {
-  id: string;
-  recipient: string;
-  message: string;
-  festivalType: string;
-  design: string;
-  date: string;
+  tokenId: bigint;
+  festival?: string;
+  message?: string;
+  imageType?: number;
+  sender?: string;
+  image?: string;
 }
 
 interface ShareModalProps {
@@ -42,7 +42,7 @@ const ShareModal = ({ greeting, open, onOpenChange }: ShareModalProps) => {
         url = `https://www.linkedin.com/sharing/share-offsite/?summary=${encodeURIComponent(messageText)}`;
         break;
       case "email":
-        url = `mailto:?subject=${encodeURIComponent(`${greeting.festivalType} Greeting for you`)}&body=${encodeURIComponent(messageText)}`;
+        url = `mailto:?subject=${encodeURIComponent(`${greeting.festival} Greeting for you`)}&body=${encodeURIComponent(messageText)}`;
         break;
     }
     window.open(url, "_blank");
@@ -54,7 +54,7 @@ const ShareModal = ({ greeting, open, onOpenChange }: ShareModalProps) => {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Share2 size={20} /> Share Your {greeting.festivalType} Greeting
+            <Share2 size={20} /> Share Your {greeting.festival} Greeting
           </DialogTitle>
           <DialogDescription>
             Share this greeting with your friends and family on social media
