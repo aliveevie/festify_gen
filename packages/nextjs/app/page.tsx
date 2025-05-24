@@ -100,7 +100,7 @@ const Home: NextPage = () => {
               Join thousands of users who are already spreading joy with personalized festival greetings.
             </p>
             <a 
-              href="/app" 
+              href="/create-greetings" 
               className="inline-block bg-white text-[#8854d0] hover:bg-gray-100 font-semibold rounded-md px-8 py-4 text-lg shadow-md transition-colors"
             >
               Create a Greeting
