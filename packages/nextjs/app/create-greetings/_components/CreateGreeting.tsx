@@ -60,9 +60,15 @@ const CreateGreeting = () => {
     }
     setIsMinting(true);
     try {
+      const design = festivalDesigns.find(d => d.id === selectedDesign);
+      const imageUri = design?.svg
+        .replace("{{message}}", message)
+        .replace("{{festival}}", festivalType)
+        .replace("{{date}}", today) || "";
+
       await writeContractAsync({
         functionName: "mintGreetingCard",
-        args: [recipientAddress, message, festivalType, selectedDesign, false],
+        args: [recipientAddress, message, festivalType, imageUri, false],
       });
       toast({ title: "Greeting created!", description: "Your greeting has been minted as an NFT." });
       setRecipientAddress("");

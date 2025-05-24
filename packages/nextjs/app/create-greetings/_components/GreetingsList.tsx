@@ -39,8 +39,6 @@ const GreetingCard = ({ tokenId, isSent }: GreetingCardProps) => {
     args: [tokenId],
   });
 
- 
-
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Prepare image URL
@@ -111,6 +109,7 @@ const GreetingCard = ({ tokenId, isSent }: GreetingCardProps) => {
 
 const GreetingsList = () => {
   const { address } = useAccount();
+  const [activeView, setActiveView] = useState<"sent" | "received">("sent");
 
   // Fetch sent and received tokenIds
   const { data: sentTokenIds, isLoading: loadingSent } = useScaffoldReadContract({
@@ -127,11 +126,36 @@ const GreetingsList = () => {
   });
 
   return (
-    <div className="space-y-12">
-      {/* Sent Greetings */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Sent Greetings</h2>
-        {loadingSent ? (
+    <div className="space-y-6">
+      <div className="flex justify-center space-x-4 mb-8">
+        <Button
+          variant={activeView === "sent" ? "default" : "outline"}
+          onClick={() => setActiveView("sent")}
+          className="min-w-[150px]"
+        >
+          Sent Greetings
+          {sentTokenIds && sentTokenIds.length > 0 && (
+            <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-white/20 text-white rounded-full">
+              {sentTokenIds.length}
+            </span>
+          )}
+        </Button>
+        <Button
+          variant={activeView === "received" ? "default" : "outline"}
+          onClick={() => setActiveView("received")}
+          className="min-w-[150px]"
+        >
+          Received Greetings
+          {receivedTokenIds && receivedTokenIds.length > 0 && (
+            <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-white/20 text-white rounded-full">
+              {receivedTokenIds.length}
+            </span>
+          )}
+        </Button>
+      </div>
+
+      {activeView === "sent" ? (
+        loadingSent ? (
           <div className="text-center py-8 text-gray-500">Loading sent greetings...</div>
         ) : !sentTokenIds || sentTokenIds.length === 0 ? (
           <div className="text-center py-8 text-gray-500">You haven't sent any greetings yet.</div>
@@ -141,23 +165,18 @@ const GreetingsList = () => {
               <GreetingCard key={tokenId.toString()} tokenId={tokenId} isSent={true} />
             ))}
           </div>
-        )}
-      </div>
-      {/* Received Greetings */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Received Greetings</h2>
-        {loadingReceived ? (
-          <div className="text-center py-8 text-gray-500">Loading received greetings...</div>
-        ) : !receivedTokenIds || receivedTokenIds.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">You haven't received any greetings yet.</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {receivedTokenIds.map((tokenId: bigint) => (
-              <GreetingCard key={tokenId.toString()} tokenId={tokenId} isSent={false} />
-            ))}
-          </div>
-        )}
-      </div>
+        )
+      ) : loadingReceived ? (
+        <div className="text-center py-8 text-gray-500">Loading received greetings...</div>
+      ) : !receivedTokenIds || receivedTokenIds.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">You haven't received any greetings yet.</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {receivedTokenIds.map((tokenId: bigint) => (
+            <GreetingCard key={tokenId.toString()} tokenId={tokenId} isSent={false} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
