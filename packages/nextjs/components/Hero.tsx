@@ -55,7 +55,7 @@ const Hero = () => {
             Customize designs, add personal messages, and spread joy through blockchain.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/app" passHref legacyBehavior>
+            <Link href="/create-greetings" passHref legacyBehavior>
               <a className="bg-[#8854d0] hover:bg-[#7c47c2] text-white px-8 py-4 text-lg rounded-md font-semibold transition-colors shadow-md">Create a Greeting</a>
             </Link>
             <Link href="/about" passHref legacyBehavior>
