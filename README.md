@@ -1,80 +1,82 @@
-# 🏗 Scaffold-ETH 2
+# Festify - Festival Greeting NFTs
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+Festify is a decentralized platform that enables users to create and send unique festival greeting NFTs with custom SVG designs. Built on Ethereum, it allows users to express their festive wishes through blockchain technology.
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+## Features
 
-⚙️ Built using NextJS, RainbowKit, Foundry, Wagmi, Viem, and Typescript.
+- Create and send festival greeting NFTs
+- Custom SVG designs for each greeting
+- Support for IPFS and on-chain SVG storage
+- Track sent and received greetings
+- Customizable greeting messages
+- Festival type categorization
+- Optional minting fee support
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+## Smart Contract Details
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
+The main contract `FestivalGreetings` is an ERC721 token contract that implements the following key features:
 
-## Requirements
+- ERC721URIStorage for NFT metadata
+- Ownable for access control
+- Custom SVG generation
+- Metadata management
+- Greeting tracking system
 
-Before you begin, you need to install the following tools:
+## Technical Specifications
 
-- [Node (>= v20.18.3)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
+- Solidity Version: ^0.8.19
+- OpenZeppelin Contracts Integration
+- SVG-based NFT artwork
+- Base64 encoding for metadata
+- IPFS support for image storage
 
-## Quickstart
+## Contract Functions
 
-To get started with Scaffold-ETH 2, follow the steps below:
+### Core Functions
+- `mintGreetingCard`: Create and send a new festival greeting NFT
+- `getGreetingMessage`: Retrieve the message of a specific greeting
+- `getGreetingFestival`: Get the festival type of a greeting
+- `getGreetingSender`: Find out who sent a greeting
+- `getGreetingImage`: Access the image URI of a greeting
+- `getSentGreetings`: View all greetings sent by an address
+- `getReceivedGreetings`: View all greetings received by an address
 
-1. Install dependencies if it was skipped in CLI:
+### Admin Functions
+- `setMintFee`: Configure the minting fee (owner only)
+- `withdraw`: Withdraw contract balance (owner only)
 
-```
-cd my-dapp-example
-yarn install
-```
+## Development
 
-2. Run a local network in the first terminal:
+### Prerequisites
+- Node.js
+- Foundry
+- OpenZeppelin Contracts
 
-```
-yarn chain
-```
+### Setup
+1. Clone the repository
+2. Install dependencies
+3. Configure your environment variables
+4. Run tests using Foundry
 
-This command starts a local Ethereum network using Foundry. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/foundry/foundry.toml`.
+## Testing
 
-3. On a second terminal, deploy the test contract:
+The project includes comprehensive test coverage using Foundry:
+- Unit tests for core functionality
+- Integration tests for contract interactions
+- Fuzz testing for input validation
 
-```
-yarn deploy
-```
+## License
 
-This command deploys a test smart contract to the local network. The contract is located in `packages/foundry/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/foundry/script` to deploy the contract to the network. You can also customize the deploy script.
+MIT License
 
-4. On a third terminal, start your NextJS app:
+## Security
 
-```
-yarn start
-```
+The contract implements standard security practices:
+- Access control through OpenZeppelin's Ownable
+- Input validation
+- Secure withdrawal mechanism
+- Protected admin functions
 
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
+## Contributing
 
-Run smart contract test with `yarn foundry:test`
-
-- Edit your smart contracts in `packages/foundry/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/foundry/script`
-
-
-## Documentation
-
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
-
-To know more about its features, check out our [website](https://scaffoldeth.io).
-
-## Contributing to Scaffold-ETH 2
-
-We welcome contributions to Scaffold-ETH 2!
-
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+Contributions are welcome! Please feel free to submit a Pull Request.
