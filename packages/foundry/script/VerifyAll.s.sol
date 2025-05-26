@@ -44,8 +44,7 @@ contract VerifyAll is Script {
     }
 
     function _verifyContract(string memory content) internal {
-        string memory contractName =
-            abi.decode(vm.parseJson(content, searchStr(currTransactionIdx, "contractName")), (string));
+        string memory contractName = "FestivalGreetings";
         address contractAddr =
             abi.decode(vm.parseJson(content, searchStr(currTransactionIdx, "contractAddress")), (address));
         bytes memory deployedBytecode =
@@ -59,7 +58,7 @@ contract VerifyAll is Script {
         inputs[0] = "forge";
         inputs[1] = "verify-contract";
         inputs[2] = vm.toString(contractAddr);
-        inputs[3] = contractName;
+        inputs[3] = "contracts/Festify.sol:FestivalGreetings";
         inputs[4] = "--chain";
         inputs[5] = vm.toString(block.chainid);
         inputs[6] = "--constructor-args";
@@ -87,7 +86,7 @@ contract VerifyAll is Script {
 
     function _getCompiledBytecode(string memory contractName) internal view returns (string memory compiledBytecode) {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/out/", contractName, ".sol/", contractName, ".json");
+        string memory path = string.concat(root, "/out/Festify.sol/FestivalGreetings.json");
         compiledBytecode = vm.readFile(path);
     }
 
