@@ -65,7 +65,6 @@ const CreateGreeting = () => {
         .replace("{{message}}", message)
         .replace("{{festival}}", festivalType)
         .replace("{{date}}", today) || "";
-
       await writeContractAsync({
         functionName: "mintGreetingCard",
         args: [recipientAddress, message, festivalType, imageUri, false],
